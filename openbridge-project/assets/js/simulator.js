@@ -28,7 +28,7 @@ window.OpenBridge = window.OpenBridge || {};
  container.innerHTML = quests.map(q => {
  const isSelected = q.id === activeQuestId;
  const title = lang === 'en' ? q.enTitle : q.esTitle;
- const story = lang === 'en' ? q.enStory : q.esStory;
+ const story = lang === 'en' ? (q.enDesc || q.enStory) : (q.esDesc || q.esStory);
  return `
  <div data-quest-id="${q.id}" class="quest-item-btn cursor-pointer p-5 rounded-2xl border transition-all flex flex-col justify-between gap-4 ${
  isSelected
@@ -275,93 +275,200 @@ window.OpenBridge = window.OpenBridge || {};
  });
  }
 
- // Submit PR & Trigger RowdyBot Review + Confetti
- const submitPrBtn = document.getElementById('submit-pr-btn');
- if (submitPrBtn) {
- submitPrBtn.addEventListener('click', async () => {
- const q = getActiveQuest();
- if (!q || !textarea) return;
+ // Submit PR & Trigger RowdyBot Review + Confetti (With Changes Requested Validation)
+    const submitPrBtn = document.getElementById('submit-pr-btn');
+    if (submitPrBtn) {
+      submitPrBtn.addEventListener('click', async () => {
+        const q = getActiveQuest();
+        if (!q || !textarea) return;
 
- const code = textarea.value;
- const nameInput = document.getElementById('contributor-name-input');
- const contributor = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'Rowdy Hacker';
+        const code = textarea.value;
+        const nameInput = document.getElementById('contributor-name-input');
+        const contributor = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'Rowdy Hacker';
 
- const prTitleInput = document.getElementById('pr-title-input');
- const prBodyInput = document.getElementById('pr-body-input');
+        const prTitleInput = document.getElementById('pr-title-input');
+        const prBodyInput = document.getElementById('pr-body-input');
 
- let prTitle = (prTitleInput && prTitleInput.value.trim()) ? prTitleInput.value.trim() : q.prTitle;
- let prBody = (prBodyInput && prBodyInput.value.trim()) ? prBodyInput.value.trim() : q.prBody;
+        let prTitle = (prTitleInput && prTitleInput.value.trim()) ? prTitleInput.value.trim() : q.prTitle;
+        let prBody = (prBodyInput && prBodyInput.value.trim()) ? prBodyInput.value.trim() : q.prBody;
 
- if (code === q.initialCode) {
- textarea.value = q.solutionCode;
- updateDiffAndValidation();
- }
- if (prTitleInput) prTitleInput.value = prTitle;
- if (prBodyInput) prBodyInput.value = prBody;
+        if (prTitleInput) prTitleInput.value = prTitle;
+        if (prBodyInput) prBodyInput.value = prBody;
 
- setStepIndicator(4);
- if (window.OpenBridge.sound) window.OpenBridge.sound.play('success');
+        const isValid = q.validate(code);
+        const reviewCard = document.getElementById('bot-review-card');
+        const botComment = document.getElementById('bot-review-comment');
+        const statusBadge = document.getElementById('bot-status-badge');
+        const statusDesc = document.getElementById('bot-status-desc');
+        const branchPill = document.getElementById('bot-branch-pill');
+        const certSection = document.getElementById('certificate-unlocked-section');
+        const actionsSection = document.getElementById('changes-requested-actions');
 
- if (typeof confetti === 'function') {
- confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
- }
+        const lang = window.OpenBridge.i18n ? window.OpenBridge.i18n.getLang() : 'en';
+        const questTitle = lang === 'en' ? q.enTitle : q.esTitle;
+        const goalText = lang === 'en' ? q.enGoal : q.esGoal;
 
- const reviewCard = document.getElementById('bot-review-card');
- if (reviewCard) {
- reviewCard.classList.remove('hidden');
- reviewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
- }
+        if (reviewCard) {
+          reviewCard.classList.remove('hidden');
+          reviewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
- const lang = window.OpenBridge.i18n ? window.OpenBridge.i18n.getLang() : 'en';
- const questTitle = lang === 'en' ? q.enTitle : q.esTitle;
- const botComment = document.getElementById('bot-review-comment');
+        // ========================================================
+        // 1. CHANGES REQUESTED (IF CODE DOES NOT SOLVE THE GOAL)
+        // ========================================================
+        if (!isValid) {
+          setStepIndicator(3);
+          if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
 
- if (botComment) {
- botComment.innerHTML = `
- <div class="flex items-center gap-2.5 text-sky-400 py-1">
- <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
- <span class="text-xs sm:text-sm font-semibold">RowdyBot AI (Gemma 4 E4B) is analyzing your code diff...</span>
- </div>
- `;
- }
+          if (reviewCard) {
+            reviewCard.className = 'bg-gradient-to-br from-slate-900 via-[#1a140d] to-slate-900 border-2 border-amber-500/60 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl transition-all';
+          }
+          if (statusBadge) {
+            statusBadge.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30';
+            statusBadge.textContent = 'CHANGES REQUESTED';
+          }
+          if (statusDesc) {
+            statusDesc.textContent = 'Code review completed • Fixes required before merging';
+          }
+          if (branchPill) {
+            branchPill.className = 'px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold';
+            branchPill.textContent = 'Action Required';
+          }
+          if (certSection) {
+            certSection.classList.add('hidden');
+          }
+          if (actionsSection) {
+            actionsSection.classList.remove('hidden');
+          }
 
- // Call Gemma 4 E4B AI engine for live token streaming review
- const diffText = document.getElementById('diff-output')?.innerText || '';
- if (window.OpenBridge.gemma) {
- await window.OpenBridge.gemma.reviewPullRequest(diffText, questTitle, contributor, lang, (chunk, fullText) => {
- if (botComment) {
- botComment.innerHTML = `
- <div class="space-y-1.5">
- <div class="flex items-center gap-2">
- <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
- <span>Verified by Gemma 4 E4B</span>
- </span>
- <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
- </div>
- <p class="text-slate-100 text-sm sm:text-base font-medium leading-relaxed">${escapeHtml(fullText)}</p>
- </div>
- `;
- }
- });
- }
+          if (botComment) {
+            botComment.innerHTML = `
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-amber-400 font-bold text-sm sm:text-base">Changes Requested by RowdyBot</span>
+                  <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">Status: Revision Needed</span>
+                </div>
+                <p class="text-slate-200 text-xs sm:text-sm leading-relaxed">
+                  ${lang === 'en'
+                    ? `Hey <strong>${escapeHtml(contributor)}</strong>! I reviewed your Pull Request, but I noticed your code doesn't quite match the quest goal yet. In open source, maintainers kindly request revisions before merging so the main project stays healthy:`
+                    : `¡Hola <strong>${escapeHtml(contributor)}</strong>! Revisé tu Pull Request, pero noté que tu código aún no cumple el objetivo de la misión. En proyectos open source, los mantenedores solicitan revisiones antes de fusionar:`
+                  }
+                </p>
+                <div class="p-3.5 rounded-xl bg-slate-950/90 border border-amber-500/30 text-amber-200 font-mono text-xs leading-relaxed">
+                  <strong>${lang === 'en' ? 'Exact Goal:' : 'Objetivo Exacto:'}</strong> ${escapeHtml(goalText)}
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  ${lang === 'en'
+                    ? 'Tip: You can click "Auto-Fix with Solution" below to see how professional developers solve this, or click "Back to Editor" to fix it yourself!'
+                    : 'Consejo: Puedes hacer clic en "Auto-Fix con Solución" abajo para que RowdyBot aplique la corrección, o volver al editor para intentarlo.'
+                  }
+                </p>
+              </div>
+            `;
+          }
 
- // Draw Official Verified Certificate
- if (window.OpenBridge.badge) {
- window.OpenBridge.badge.draw(contributor, questTitle);
- }
+          if (window.OpenBridge.common) {
+            window.OpenBridge.common.showToast('Changes Requested: Please check RowdyBot feedback', '');
+          }
+          return;
+        }
 
- if (window.OpenBridge.sound) window.OpenBridge.sound.play('success');
- if (typeof confetti === 'function') {
- confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
- }
+        // ========================================================
+        // 2. APPROVED & MERGED (CODE ACCURATELY SOLVES THE GOAL)
+        // ========================================================
+        setStepIndicator(4);
 
- if (window.OpenBridge.common) {
- window.OpenBridge.common.showToast('Pull Request Merged! Gemma 4 E4B verified your badge ', '');
- }
- });
- }
+        if (reviewCard) {
+          reviewCard.className = 'bg-gradient-to-br from-slate-900 via-[#0d1f33] to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl transition-all';
+        }
+        if (statusBadge) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30';
+          statusBadge.textContent = 'APPROVED & MERGED';
+        }
+        if (statusDesc) {
+          statusDesc.textContent = 'Automated checks passed • Merged into main branch';
+        }
+        if (branchPill) {
+          branchPill.className = 'px-3.5 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-mono font-bold';
+          branchPill.textContent = 'Merged into main';
+        }
+        if (actionsSection) {
+          actionsSection.classList.add('hidden');
+        }
+        if (certSection) {
+          certSection.classList.remove('hidden');
+        }
 
- // Jump to Real Issues Page / Tab
+        if (botComment) {
+          botComment.innerHTML = `
+            <div class="flex items-center gap-2.5 text-sky-400 py-1">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+              <span class="text-xs sm:text-sm font-semibold">RowdyBot AI (Gemma 4 E4B) is analyzing your code diff...</span>
+            </div>
+          `;
+        }
+
+        // Call Gemma 4 E4B AI engine for live token streaming review
+        const diffText = document.getElementById('diff-output')?.innerText || '';
+        if (window.OpenBridge.gemma) {
+          await window.OpenBridge.gemma.reviewPullRequest(diffText, questTitle, contributor, lang, (chunk, fullText) => {
+            if (botComment) {
+              botComment.innerHTML = `
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span>Verified by Gemma 4 E4B</span>
+                    </span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </div>
+                  <p class="text-slate-100 text-sm sm:text-base font-medium leading-relaxed">${escapeHtml(fullText)}</p>
+                </div>
+              `;
+            }
+          });
+        }
+
+        // Draw Official Verified Certificate Badge
+        if (window.OpenBridge.badge) {
+          window.OpenBridge.badge.draw(contributor, questTitle);
+        }
+
+        if (window.OpenBridge.sound) window.OpenBridge.sound.play('success');
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+        }
+
+        if (window.OpenBridge.common) {
+          window.OpenBridge.common.showToast('Pull Request Merged! Gemma 4 E4B verified your badge', '');
+        }
+      });
+    }
+
+    // Changes Requested Action Buttons Handler
+    const fixAndMergeBtn = document.getElementById('fix-and-merge-btn');
+    if (fixAndMergeBtn) {
+      fixAndMergeBtn.addEventListener('click', () => {
+        const q = getActiveQuest();
+        if (!q || !textarea) return;
+        textarea.value = q.solutionCode;
+        updateDiffAndValidation();
+        if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
+        if (submitPrBtn) submitPrBtn.click();
+      });
+    }
+
+    const backToEditorBtn = document.getElementById('back-to-editor-btn');
+    if (backToEditorBtn) {
+      backToEditorBtn.addEventListener('click', () => {
+        setStepIndicator(2);
+        if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
+        const s2 = document.getElementById('step-section-2');
+        if (s2) s2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (textarea) textarea.focus();
+      });
+    }
+
+  // Jump to Real Issues Page / Tab
  const goToIssuesBtn = document.getElementById('go-to-live-issues-btn');
  if (goToIssuesBtn) {
  goToIssuesBtn.addEventListener('click', () => {
@@ -410,7 +517,7 @@ window.OpenBridge = window.OpenBridge || {};
  const plainDesc = document.getElementById('mission-plain-desc');
  const goalExact = document.getElementById('mission-goal-exact');
  if (plainTitle) plainTitle.textContent = lang === 'en' ? q.enTitle : q.esTitle;
- if (plainDesc) plainDesc.textContent = lang === 'en' ? q.enStory : q.esStory;
+ if (plainDesc) plainDesc.textContent = lang === 'en' ? (q.enDesc || q.enStory) : (q.esDesc || q.esStory);
  if (goalExact) goalExact.textContent = lang === 'en' ? q.enGoal : q.esGoal;
  }
  updateDiffAndValidation();
