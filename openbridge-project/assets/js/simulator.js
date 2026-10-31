@@ -28,23 +28,30 @@ window.OpenBridge = window.OpenBridge || {};
     container.innerHTML = quests.map(q => {
       const isSelected = q.id === activeQuestId;
       const title = lang === 'en' ? q.enTitle : q.esTitle;
+      const story = lang === 'en' ? q.enStory : q.esStory;
       return `
-        <button data-quest-id="${q.id}" class="quest-item-btn w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 ${
+        <div data-quest-id="${q.id}" class="quest-item-btn cursor-pointer p-5 rounded-2xl border transition-all flex flex-col justify-between gap-4 ${
           isSelected
-            ? 'bg-orange-500/15 border-orange-500 shadow-md shadow-orange-500/10'
-            : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+            ? 'bg-orange-500/10 border-orange-500 shadow-xl shadow-orange-500/10 ring-2 ring-orange-500/30'
+            : 'bg-slate-900/90 border-slate-800 hover:border-slate-700 hover:bg-slate-850'
         }">
-          <span class="text-xl mt-0.5">${q.icon}</span>
-          <div class="flex-1 min-w-0">
+          <div class="space-y-2.5">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-xs sm:text-sm text-white truncate">${title}</span>
+              <span class="text-3xl">${q.icon}</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-sky-300 font-semibold border border-slate-700">${q.badgeTag}</span>
             </div>
-            <div class="flex items-center gap-2 mt-1">
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-sky-300 font-medium">${q.badgeTag}</span>
-              <span class="text-[10px] text-slate-400 font-mono">${q.file}</span>
+            <div>
+              <h3 class="font-bold text-white text-base sm:text-lg">${title}</h3>
+              <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">${story}</p>
             </div>
           </div>
-        </button>
+          <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+            <span class="font-mono text-slate-400">📄 ${q.file}</span>
+            <span class="font-bold flex items-center gap-1 ${isSelected ? 'text-orange-400' : 'text-sky-400'}">
+              ${isSelected ? '✓ Active Quest' : 'Start Quest →'}
+            </span>
+          </div>
+        </div>
       `;
     }).join('');
 
@@ -56,6 +63,9 @@ window.OpenBridge = window.OpenBridge || {};
           if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
           loadActiveQuestIntoWorkspace();
           renderQuestList();
+          setStepIndicator(2);
+          const s2 = document.getElementById('step-section-2');
+          if (s2) s2.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
     });
@@ -353,17 +363,9 @@ window.OpenBridge = window.OpenBridge || {};
         const s = parseInt(pill.getAttribute('data-step-nav'), 10);
         setStepIndicator(s);
         if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
-        if (s === 1) {
-          const questEl = document.getElementById('quest-list-container');
-          if (questEl) questEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (s === 2) {
-          if (textarea) textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (s === 3) {
-          const prCard = document.getElementById('pr-submission-card');
-          if (prCard) prCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (s === 4) {
-          const reviewCard = document.getElementById('bot-review-card');
-          if (reviewCard) reviewCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const target = document.getElementById(`step-section-${s}`);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
     });
