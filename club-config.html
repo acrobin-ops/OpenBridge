@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Club Configuration Builder — OpenBridge UTSA OSPO</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/visuals.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            utsa: {
+              orange: '#F15A22',
+              navy: '#0C2340',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-orange-500 selection:text-white">
+
+  <!-- GLOBAL FLOATING JARGON POPOVER -->
+  <div id="jargon-popover" class="fixed z-50 hidden max-w-xs bg-slate-900/95 backdrop-blur-md border border-sky-500/40 rounded-xl p-3.5 shadow-2xl text-xs pointer-events-none transition-opacity duration-150">
+    <div class="flex items-center justify-between mb-1">
+      <span id="popover-term" class="font-bold text-sky-400 text-sm">Term</span>
+      <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono text-[10px]">Jargon Decoder</span>
+    </div>
+    <p id="popover-desc" class="text-slate-200 leading-relaxed mb-2"></p>
+    <div class="p-2 rounded bg-slate-800/90 border border-slate-700/70 text-amber-300/90 italic text-[11px]" id="popover-analogy"></div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+  <!-- TOP NAVIGATION -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Logo & Club Name -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-orange-500 shadow-lg shadow-orange-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
+          <img src="assets/images/rowdybot.jpg" alt="RowdyBot Mascot" class="w-full h-full object-cover" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="brand-title" class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-orange-400 bg-clip-text text-transparent">OpenBridge</span>
+            <span id="brand-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">UTSA OSPO</span>
+          </div>
+          <p id="brand-subtitle" class="text-xs text-slate-400 hidden sm:block">Zero-Barrier Open Source PR Launchpad</p>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
+        <a href="index.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+          <span>🚀</span> <span data-i18n="nav_sim">PR Simulator</span>
+        </a>
+        <a href="visualizer.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+          <span>🌿</span> <span data-i18n="nav_viz">Git vs English</span>
+        </a>
+        <a href="issues.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+          <span>🧭</span> <span data-i18n="nav_issues">Live Issues</span>
+        </a>
+        <a href="glossary.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+          <span>📖</span> <span data-i18n="nav_glossary">Jargon Decoder</span>
+        </a>
+        <a href="club-config.html" class="nav-tab-btn active px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-orange-500 text-white shadow-sm flex items-center gap-1.5">
+          <span>⚙️</span> <span data-i18n="nav_reuse">Club Config</span>
+        </a>
+        <a href="visuals.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+          <span>🎨</span> <span>Visuals</span>
+        </a>
+      </nav>
+
+      <!-- Language & Audio Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Bilingual Switcher -->
+        <button id="lang-toggle-btn" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm" title="Switch English / Español">
+          <span>🌐</span>
+          <span id="lang-label" class="text-sky-400">EN</span>
+          <span class="text-slate-600">/</span>
+          <span id="lang-label-alt" class="text-slate-400">ES</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button id="sound-toggle-btn" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs transition-all" title="Toggle Sound Effects">
+          <span id="sound-icon">🔊</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+<section id="tab-reusability" class="tab-panel space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+        <div class="max-w-3xl space-y-1.5">
+          <span class="px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 text-xs font-semibold">Judging Criterion: Reusability (MIT Licensed)</span>
+          <h2 class="text-2xl font-extrabold text-white">Live Campus & Club Customizer (`club.config.json`)</h2>
+          <p class="text-sm text-slate-300">
+            Any university OSPO, ACM chapter, or high school coding club can adopt OpenBridge in 60 seconds. Test changing the school name and theme below—watch the live app header update immediately!
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Customizer Form -->
+          <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div>
+              <label for="cfg-org-input" class="block text-xs font-bold text-slate-300 mb-1">University / Club Badge Name</label>
+              <input id="cfg-org-input" type="text" value="UTSA OSPO" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
+            </div>
+            <div>
+              <label for="cfg-title-input" class="block text-xs font-bold text-slate-300 mb-1">Platform Portal Title</label>
+              <input id="cfg-title-input" type="text" value="OpenBridge" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
+            </div>
+            <div>
+              <label for="cfg-repo-input" class="block text-xs font-bold text-slate-300 mb-1">Default Practice Repository</label>
+              <input id="cfg-repo-input" type="text" value="utsa-ospo/student-launchpad" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white font-mono" />
+            </div>
+            <div class="flex items-center gap-3 pt-2">
+              <button id="apply-config-btn" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm transition-all">
+                ✨ Apply Branding Live
+              </button>
+              <button id="copy-config-btn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700 transition-all">
+                📋 Copy club.config.json
+              </button>
+            </div>
+          </div>
+
+          <!-- Generated JSON Output -->
+          <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-mono text-emerald-400">club.config.json</span>
+              <span>MIT License • Ready to Fork</span>
+            </div>
+            <pre id="config-json-preview" class="p-4 rounded-xl bg-[#070a12] text-sky-300 code-font text-xs overflow-x-auto border border-slate-800 leading-relaxed"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/60 py-4 px-4 sm:px-6 mt-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">OpenBridge</span>
+        <span>•</span>
+        <span>Built for RowdyLaunch Track 03 (Open Source Education — UTSA OSPO)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="visuals.html" class="hover:text-white transition-colors">UI Kit & Visuals</a>
+        <span>•</span>
+        <a href="all-in-one.html" class="hover:text-white transition-colors">Single-Page SPA View</a>
+        <span>•</span>
+        <a href="https://github.com/utsa-ospo" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:text-orange-300 font-semibold">UTSA OSPO GitHub ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODULAR SCRIPTS (Code Separated from Markup & Visuals) -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/sound.js"></script>
+  <script src="assets/js/badge.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/simulator.js"></script>
+  <script src="assets/js/visualizer.js"></script>
+  <script src="assets/js/issues.js"></script>
+  <script src="assets/js/glossary.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
