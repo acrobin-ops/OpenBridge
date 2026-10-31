@@ -17,18 +17,18 @@ window.OpenBridge = window.OpenBridge || {};
 
  // Background Gradient
  const grad = ctx.createLinearGradient(0, 0, w, h);
- grad.addColorStop(0, '#0C2340');
- grad.addColorStop(0.6, '#0f172a');
- grad.addColorStop(1, '#1e1b4b');
+ grad.addColorStop(0, '#090a16');
+ grad.addColorStop(0.5, '#120f2e');
+ grad.addColorStop(1, '#24144d');
  ctx.fillStyle = grad;
  ctx.fillRect(0, 0, w, h);
 
  // Glowing Border
- ctx.strokeStyle = '#F15A22';
+ ctx.strokeStyle = '#00138dff';
  ctx.lineWidth = 6;
  ctx.strokeRect(12, 12, w - 24, h - 24);
 
- ctx.strokeStyle = '#38bdf8';
+ ctx.strokeStyle = '#ebb502ff';
  ctx.lineWidth = 1.5;
  ctx.strokeRect(20, 20, w - 40, h - 40);
 
@@ -50,7 +50,7 @@ window.OpenBridge = window.OpenBridge || {};
  ctx.fillText('Official Verified Contribution Certificate', 36, 122);
 
  // Recipient Name
- ctx.fillStyle = '#38bdf8';
+ ctx.fillStyle = '#F15A22';
  ctx.font = 'bold 26px Inter, sans-serif';
  ctx.fillText(contributorName || 'Rowdy Contributor', 36, 168);
 
@@ -61,7 +61,7 @@ window.OpenBridge = window.OpenBridge || {};
 
  // Footer Metadata
  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
- ctx.fillStyle = '#10b981';
+ ctx.fillStyle = '#5E69EE';
  ctx.font = 'bold 12px JetBrains Mono, monospace';
  ctx.fillText(`STATUS: MERGED INTO MAIN • ${dateStr}`, 36, 250);
 
@@ -71,10 +71,10 @@ window.OpenBridge = window.OpenBridge || {};
  ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
  ctx.fill();
  ctx.lineWidth = 3;
- ctx.strokeStyle = '#10b981';
+ ctx.strokeStyle = '#5E69EE';
  ctx.stroke();
 
- ctx.fillStyle = '#10b981';
+ ctx.fillStyle = '#5E69EE';
  ctx.font = 'bold 14px Inter, sans-serif';
  ctx.textAlign = 'center';
  ctx.fillText('MERGED', w - 85, h / 2 + 8);
