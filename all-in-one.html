@@ -106,7 +106,7 @@
  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
  <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-1">
- <span>Track 03 • Zero-Barrier PR Launchpad</span>
+ <span>Zero-Barrier PR Launchpad</span>
  </div>
  <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Make Your First Open Source Contribution</h1>
  <p class="text-sm text-slate-400 mt-1">Complete 4 simple steps to open, edit, and merge your first real Pull Request.</p>
@@ -462,12 +462,56 @@
  Search any intimidating Git or GitHub term to see its plain-language definition and everyday analogy in English and Spanish.
  </p>
  </div>
- <div class="w-full sm:w-72">
- <input id="glossary-search-input" type="search" placeholder="Search term (e.g. Fork, PR, Merge)..." class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-sky-400 focus:outline-none" />
- </div>
+ <div class="flex items-center gap-2 w-full sm:w-auto">
+            <input id="glossary-search-input" type="search" placeholder="Search term (e.g. Fork, PR, Merge)..." class="w-full sm:w-64 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-sky-400 focus:outline-none" />
+            <button id="open-add-term-btn" class="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm whitespace-nowrap transition-all shadow-md">
+              + Add Term
+            </button>
+          </div>
  </div>
 
- <div id="glossary-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+         <!-- ADD TERM MODAL DIALOG -->
+        <div id="add-term-modal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div class="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 class="text-lg font-bold text-white">Add New Open Source Jargon Term</h3>
+              <button id="cancel-add-term-btn" type="button" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+            </div>
+
+            <form id="add-term-form" class="space-y-4">
+              <div>
+                <label for="new-term-name" class="block text-xs font-bold text-slate-300 mb-1">Term Name (English) *</label>
+                <input id="new-term-name" type="text" required placeholder="e.g., Cherry-pick, Squash, Upstream" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
+              </div>
+
+              <div>
+                <label for="new-term-es" class="block text-xs font-bold text-slate-300 mb-1">Spanish Translation / Término en Español</label>
+                <input id="new-term-es" type="text" placeholder="e.g., Selección específica, Combinar commits" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
+              </div>
+
+              <div>
+                <label for="new-term-def" class="block text-xs font-bold text-slate-300 mb-1">Plain-Language Definition *</label>
+                <textarea id="new-term-def" rows="3" required placeholder="Explain clearly in everyday terms without gatekeeping jargon..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+
+              <div>
+                <label for="new-term-analogy" class="block text-xs font-bold text-slate-300 mb-1">Everyday Real-World Analogy</label>
+                <textarea id="new-term-analogy" rows="2" placeholder="e.g., Like picking just the strawberries out of a fruit salad..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+
+              <div class="flex items-center justify-end gap-3 pt-2">
+                <button type="button" onclick="document.getElementById('add-term-modal').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+                  Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-lg shadow-orange-500/20">
+                  Save Term to Decoder
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="glossary-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
  </div>
  </section>
 
@@ -524,7 +568,7 @@
  <div class="flex items-center gap-2">
  <span class="font-bold text-white">OpenBridge</span>
  <span>•</span>
- <span>Built for RowdyLaunch Track 03 (Open Source Education — UTSA OSPO)</span>
+ <span>Built for RowdyLaunch  (Open Source Education — UTSA OSPO)</span>
  </div>
  <div class="flex items-center gap-3">
  <a href="index.html" class="text-orange-400 hover:text-orange-300">Multi-Page Mode</a>
