@@ -1,564 +1,562 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PR Simulator — OpenBridge UTSA OSPO</title>
-  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="stylesheet" href="assets/css/visuals.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            utsa: {
-              orange: '#F15A22',
-              navy: '#0C2340',
-            }
-          }
-        }
-      }
-    }
-  </script>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>PR Simulator — OpenBridge UTSA OSPO</title>
+ <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+ <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+ <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="assets/css/styles.css">
+ <link rel="stylesheet" href="assets/css/visuals.css">
+ <script>
+ tailwind.config = {
+ darkMode: 'class',
+ theme: {
+ extend: {
+ fontFamily: {
+ sans: ['Inter', 'sans-serif'],
+ mono: ['JetBrains Mono', 'monospace'],
+ },
+ colors: {
+ utsa: {
+ orange: '#F15A22',
+ navy: '#0C2340',
+ }
+ }
+ }
+ }
+ }
+ </script>
 </head>
 <body class="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-orange-500 selection:text-white">
 
-  <!-- GLOBAL FLOATING JARGON POPOVER -->
-  <div id="jargon-popover" class="fixed z-50 hidden max-w-xs bg-slate-900/95 backdrop-blur-md border border-sky-500/40 rounded-xl p-3.5 shadow-2xl text-xs pointer-events-none transition-opacity duration-150">
-    <div class="flex items-center justify-between mb-1">
-      <span id="popover-term" class="font-bold text-sky-400 text-sm">Term</span>
-      <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono text-[10px]">Jargon Decoder</span>
-    </div>
-    <p id="popover-desc" class="text-slate-200 leading-relaxed mb-2"></p>
-    <div class="p-2 rounded bg-slate-800/90 border border-slate-700/70 text-amber-300/90 italic text-[11px]" id="popover-analogy"></div>
-  </div>
+ <!-- GLOBAL FLOATING JARGON POPOVER -->
+ <div id="jargon-popover" class="fixed z-50 hidden max-w-xs bg-slate-900/95 backdrop-blur-md border border-sky-500/40 rounded-xl p-3.5 shadow-2xl text-xs pointer-events-none transition-opacity duration-150">
+ <div class="flex items-center justify-between mb-1">
+ <span id="popover-term" class="font-bold text-sky-400 text-sm">Term</span>
+ <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono text-[10px]">Jargon Decoder</span>
+ </div>
+ <p id="popover-desc" class="text-slate-200 leading-relaxed mb-2"></p>
+ <div class="p-2 rounded bg-slate-800/90 border border-slate-700/70 text-amber-300/90 italic text-[11px]" id="popover-analogy"></div>
+ </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+ <!-- TOAST NOTIFICATION -->
+ <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
 
-  <!-- TOP NAVIGATION -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-      <!-- Brand Logo & Club Name -->
-      <a href="index.html" class="flex items-center gap-3 group">
-        <div class="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-orange-500 shadow-lg shadow-orange-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
-          <img src="assets/images/images.png" alt="RowdyBot Mascot" class="w-full h-full object-contain" />
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span id="brand-title" class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-orange-400 bg-clip-text text-transparent">OpenBridge</span>
-            <span id="brand-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">UTSA OSPO</span>
-          </div>
-          <p id="brand-subtitle" class="text-xs text-slate-400 hidden sm:block">Zero-Barrier Open Source PR Launchpad</p>
-        </div>
-      </a>
+ <!-- TOP NAVIGATION -->
+ <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md">
+ <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+ <!-- Brand Logo & Club Name -->
+ <a href="index.html" class="flex items-center gap-3 group">
+ <div class="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-orange-500 shadow-lg shadow-orange-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
+ <img src="assets/images/images.png" alt="RowdyBot Mascot" class="w-full h-full object-contain" />
+ </div>
+ <div>
+ <div class="flex items-center gap-2">
+ <span id="brand-title" class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-orange-400 bg-clip-text text-transparent">OpenBridge</span>
+ <span id="brand-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">UTSA OSPO</span>
+ </div>
+ <p id="brand-subtitle" class="text-xs text-slate-400 hidden sm:block">Zero-Barrier Open Source PR Launchpad</p>
+ </div>
+ </a>
 
-      
-      <!-- Navigation Tabs (SPA Mode) -->
-      <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
-        <button data-tab="simulator" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-orange-500 text-white shadow-sm flex items-center gap-1.5">
-          <span>🚀</span> <span data-i18n="nav_sim">PR Simulator</span>
-        </button>
-        <button data-tab="visualizer" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
-          <span>🌿</span> <span data-i18n="nav_viz">Git vs English</span>
-        </button>
-        <button data-tab="issues" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
-          <span>🧭</span> <span data-i18n="nav_issues">Live Issues</span>
-        </button>
-        <button data-tab="glossary" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
-          <span>📖</span> <span data-i18n="nav_glossary">Jargon Decoder</span>
-        </button>
-        <button data-tab="reusability" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
-          <span>⚙️</span> <span data-i18n="nav_reuse">Club Config</span>
-        </button>
-        <a href="visuals.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
-          <span>🎨</span> <span>Visuals</span>
-        </a>
-      </nav>
-      <!-- Language & Audio Controls -->
-      <div class="flex items-center gap-2">
-        <button id="lang-toggle-btn" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm" title="Switch English / Español">
-          <span>🌐</span>
-          <span id="lang-label" class="text-sky-400 font-bold">EN</span>
-          <span class="text-slate-600">/</span>
-          <span id="lang-label-alt" class="text-slate-400">ES</span>
-        </button>
-        <button id="sound-toggle-btn" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs transition-all" title="Toggle Sound Effects">
-          <span id="sound-icon">🔊</span>
-        </button>
-      </div>
-    </div>
-  </header>
+ 
+ <!-- Navigation Tabs (SPA Mode) -->
+ <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
+ <button data-tab="simulator" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-orange-500 text-white shadow-sm flex items-center gap-1.5">
+ <span data-i18n="nav_sim">PR Simulator</span>
+ </button>
+ <button data-tab="visualizer" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+ <span data-i18n="nav_viz">Git vs English</span>
+ </button>
+ <button data-tab="issues" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+ <span data-i18n="nav_issues">Live Issues</span>
+ </button>
+ <button data-tab="glossary" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+ <span data-i18n="nav_glossary">Jargon Decoder</span>
+ </button>
+ <button data-tab="reusability" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+ <span data-i18n="nav_reuse">Club Config</span>
+ </button>
+ <a href="visuals.html" class="nav-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5">
+ <span>Visuals</span>
+ </a>
+ </nav>
+ <!-- Language & Audio Controls -->
+ <div class="flex items-center gap-2">
+ <button id="lang-toggle-btn" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm" title="Switch English / Español">
+ <span id="lang-label" class="text-sky-400 font-bold">EN</span>
+ <span class="text-slate-600">/</span>
+ <span id="lang-label-alt" class="text-slate-400">ES</span>
+ </button>
+ <button id="sound-toggle-btn" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs transition-all" title="Toggle Sound Effects">
+ <span id="sound-icon">Audio: ON</span>
+ </button>
+ </div>
+ </div>
+ </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+ <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
 <section id="tab-simulator" class="tab-panel space-y-8">
 
-    <!-- STEP PROGRESS TRACKER -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-1">
-            <span>🚀</span> <span>Track 03 • Zero-Barrier PR Launchpad</span>
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Make Your First Open Source Contribution</h1>
-          <p class="text-sm text-slate-400 mt-1">Complete 4 simple steps to open, edit, and merge your first real Pull Request.</p>
-        </div>
+ <!-- STEP PROGRESS TRACKER -->
+ <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+ <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+ <div>
+ <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-1">
+ <span>Track 03 • Zero-Barrier PR Launchpad</span>
+ </div>
+ <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Make Your First Open Source Contribution</h1>
+ <p class="text-sm text-slate-400 mt-1">Complete 4 simple steps to open, edit, and merge your first real Pull Request.</p>
+ </div>
 
-        <!-- 4 Step Navigation Pills -->
-        <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800 self-start md:self-center overflow-x-auto max-w-full">
-          <button data-step-nav="1" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-orange-500 text-white shadow">
-            <span>1</span> <span>Pick Quest</span>
-          </button>
-          <span class="text-slate-600">→</span>
-          <button data-step-nav="2" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-            <span>2</span> <span>Edit Code</span>
-          </button>
-          <span class="text-slate-600">→</span>
-          <button data-step-nav="3" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-            <span>3</span> <span>Submit PR</span>
-          </button>
-          <span class="text-slate-600">→</span>
-          <button data-step-nav="4" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-            <span>4</span> <span>Your Badge</span>
-          </button>
-        </div>
-      </div>
-    </div>
+ <!-- 4 Step Navigation Pills -->
+ <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800 self-start md:self-center overflow-x-auto max-w-full">
+ <button data-step-nav="1" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-orange-500 text-white shadow">
+ <span>1</span> <span>Pick Quest</span>
+ </button>
+ <span class="text-slate-600">→</span>
+ <button data-step-nav="2" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+ <span>2</span> <span>Edit Code</span>
+ </button>
+ <span class="text-slate-600">→</span>
+ <button data-step-nav="3" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+ <span>3</span> <span>Submit PR</span>
+ </button>
+ <span class="text-slate-600">→</span>
+ <button data-step-nav="4" class="step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+ <span>4</span> <span>Your Badge</span>
+ </button>
+ </div>
+ </div>
+ </div>
 
-    <!-- ==========================================
-         STEP 1: CHOOSE YOUR STARTER QUEST
-         ========================================== -->
-    <section id="step-section-1" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <span>🎯</span> 1. Select Your Starter Quest
-          </h2>
-          <p class="text-sm text-slate-400">Choose any quest below. Click a card to load it directly into the editor.</p>
-        </div>
-        <span id="quest-count-badge" class="px-3 py-1 rounded-full bg-slate-800 text-sky-300 text-xs font-medium border border-slate-700">
-          4 Quests Available
-        </span>
-      </div>
+ <!-- ==========================================
+ STEP 1: CHOOSE YOUR STARTER QUEST
+ ========================================== -->
+ <section id="step-section-1" class="space-y-4">
+ <div class="flex items-center justify-between">
+ <div>
+ <h2 class="text-xl font-bold text-white flex items-center gap-2">
+ 1. Select Your Starter Quest
+ </h2>
+ <p class="text-sm text-slate-400">Choose any quest below. Click a card to load it directly into the editor.</p>
+ </div>
+ <span id="quest-count-badge" class="px-3 py-1 rounded-full bg-slate-800 text-sky-300 text-xs font-medium border border-slate-700">
+ 4 Quests Available
+ </span>
+ </div>
 
-      <!-- Quest Cards Container (Spacious 2x2 Grid) -->
-      <div id="quest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
+ <!-- Quest Cards Container (Spacious 2x2 Grid) -->
+ <div id="quest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+ </section>
 
-    <!-- ==========================================
-         STEP 2: SANDBOX WORKSPACE & LIVE DIFF
-         ========================================== -->
-    <section id="step-section-2" class="space-y-5 pt-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <span>✏️</span> 2. Code Sandbox & Live Diff
-          </h2>
-          <p class="text-sm text-slate-400">Edit the file to complete your goal. You can test your solution safely here.</p>
-        </div>
-      </div>
+ <!-- ==========================================
+ STEP 2: SANDBOX WORKSPACE & LIVE DIFF
+ ========================================== -->
+ <section id="step-section-2" class="space-y-5 pt-4">
+ <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+ <div>
+ <h2 class="text-xl font-bold text-white flex items-center gap-2">
+ 2. Code Sandbox & Live Diff
+ </h2>
+ <p class="text-sm text-slate-400">Edit the file to complete your goal. You can test your solution safely here.</p>
+ </div>
+ </div>
 
-      <!-- Clear Mission Assignment Card -->
-      <div class="bg-gradient-to-r from-slate-900 to-[#0e1d38] border border-sky-500/30 rounded-2xl p-5 sm:p-6 shadow-lg space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
-          <div class="flex items-center gap-2.5">
-            <span class="text-2xl">📋</span>
-            <div>
-              <h3 id="mission-plain-title" class="font-bold text-white text-base sm:text-lg">Assignment Brief</h3>
-              <span id="active-quest-time" class="text-xs text-emerald-400 font-medium">Estimated: ~2 mins</span>
-            </div>
-          </div>
+ <!-- Clear Mission Assignment Card -->
+ <div class="bg-gradient-to-r from-slate-900 to-[#0e1d38] border border-sky-500/30 rounded-2xl p-5 sm:p-6 shadow-lg space-y-4">
+ <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+ <div class="flex items-center gap-2.5">
+ <span class="text-2xl"></span>
+ <div>
+ <h3 id="mission-plain-title" class="font-bold text-white text-base sm:text-lg">Assignment Brief</h3>
+ <span id="active-quest-time" class="text-xs text-emerald-400 font-medium">Estimated: ~2 mins</span>
+ </div>
+ </div>
 
-          <div class="flex items-center gap-2">
-            <button id="apply-hint-btn" class="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-bold transition-all flex items-center gap-1.5">
-              <span>🪄</span> <span>Auto-Fill Solution</span>
-            </button>
-            <button id="reset-code-btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all">
-              ↺ Reset
-            </button>
-          </div>
-        </div>
+ <div class="flex items-center gap-2">
+ <button id="apply-hint-btn" class="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-bold transition-all flex items-center gap-1.5">
+ <span>Auto-Fill Solution</span>
+ </button>
+ <button id="reset-code-btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all">
+ Reset
+ </button>
+ </div>
+ </div>
 
-        <p id="active-quest-desc" class="text-sm text-slate-300 leading-relaxed"></p>
+ <p id="active-quest-desc" class="text-sm text-slate-300 leading-relaxed"></p>
 
-        <!-- The Exact Goal Box -->
-        <div class="p-4 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5">
-          <div class="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
-            <span>💡</span> <span>Your Exact Goal:</span>
-          </div>
-          <p id="active-quest-goal" class="text-xs sm:text-sm text-slate-100 font-mono leading-relaxed"></p>
-        </div>
+ <!-- The Exact Goal Box -->
+ <div class="p-4 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5">
+ <div class="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
+ <span>Your Exact Goal:</span>
+ </div>
+ <p id="active-quest-goal" class="text-xs sm:text-sm text-slate-100 font-mono leading-relaxed"></p>
+ </div>
 
-                <!-- RowdyBot Tip & Ask Gemma 4 E4B Input -->
-        <div class="space-y-3 pt-1 text-xs text-slate-300 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
-          <div class="flex items-start gap-3">
-            <img src="assets/images/images.png" alt="RowdyBot" class="w-9 h-9 rounded-lg object-contain bg-slate-900 border border-sky-400/40 p-0.5 flex-shrink-0 mt-0.5" />
-            <div class="space-y-1 flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-white text-xs sm:text-sm">RowdyBot Mentor</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Gemma 4 E4B
-                </span>
-              </div>
-              <p id="rowdybot-coach-msg" class="italic text-slate-300 text-xs sm:text-sm leading-relaxed">
-                "Make your change in the editor below. You can also ask me any question about Git or this quest below!"
-              </p>
-            </div>
-          </div>
+ <!-- RowdyBot Tip & Ask Gemma 4 E4B Input -->
+ <div class="space-y-3 pt-1 text-xs text-slate-300 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+ <div class="flex items-start gap-3">
+ <img src="assets/images/images.png" alt="RowdyBot" class="w-9 h-9 rounded-lg object-contain bg-slate-900 border border-sky-400/40 p-0.5 flex-shrink-0 mt-0.5" />
+ <div class="space-y-1 flex-1 min-w-0">
+ <div class="flex items-center gap-2">
+ <span class="font-bold text-white text-xs sm:text-sm">RowdyBot Mentor</span>
+ <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 flex items-center gap-1">
+ <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+ Gemma 4 E4B
+ </span>
+ </div>
+ <p id="rowdybot-coach-msg" class="italic text-slate-300 text-xs sm:text-sm leading-relaxed">
+"Make your change in the editor below. You can also ask me any question about Git or this quest below!"
+ </p>
+ </div>
+ </div>
 
-          <!-- Ask RowdyBot AI Input Box -->
-          <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2">
-            <input id="coach-question-input" type="text" placeholder="Ask RowdyBot anything (e.g., Why do we use branches? What is a diff?)..." class="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none" />
-            <button id="ask-coach-btn" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-slate-950 font-bold text-xs transition-all flex items-center gap-1">
-              <span>Ask</span> <span>⚡</span>
-            </button>
-          </div>
-        </div>
-      </div>
+ <!-- Ask RowdyBot AI Input Box -->
+ <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+ <input id="coach-question-input" type="text" placeholder="Ask RowdyBot anything (e.g., Why do we use branches? What is a diff?)..." class="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none" />
+ <button id="ask-coach-btn" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-slate-950 font-bold text-xs transition-all flex items-center gap-1">
+ <span>Ask</span> </button>
+ </div>
+ </div>
+ </div>
 
-      <!-- Code Workspace Container -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <!-- Top Toolbar -->
-        <div class="bg-slate-950 px-5 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3 text-xs sm:text-sm font-mono">
-            <span class="text-slate-400 font-sans">File:</span>
-            <code id="current-file-name" class="text-orange-400 font-bold">README.md</code>
-            <span class="text-slate-600">|</span>
-            <span class="text-slate-400 font-sans">Branch:</span>
-            <code id="current-branch-name" class="text-emerald-400 font-mono">fix/docs-link</code>
-          </div>
+ <!-- Code Workspace Container -->
+ <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+ <!-- Top Toolbar -->
+ <div class="bg-slate-950 px-5 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+ <div class="flex items-center gap-3 text-xs sm:text-sm font-mono">
+ <span class="text-slate-400 font-sans">File:</span>
+ <code id="current-file-name" class="text-orange-400 font-bold">README.md</code>
+ <span class="text-slate-600">|</span>
+ <span class="text-slate-400 font-sans">Branch:</span>
+ <code id="current-branch-name" class="text-emerald-400 font-mono">fix/docs-link</code>
+ </div>
 
-          <!-- Switcher: Editor vs Diff -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
-              <button id="view-edit-btn" class="px-3.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white shadow">
-                ✏️ Code Editor
-              </button>
-              <button id="view-diff-btn" class="px-3.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-                🔍 Live Diff Preview
-              </button>
-            </div>
-            <span id="validation-pill" class="text-xs font-medium px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-              ⏳ Waiting for edit...
-            </span>
-          </div>
-        </div>
+ <!-- Switcher: Editor vs Diff -->
+ <div class="flex items-center gap-3">
+ <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
+ <button id="view-edit-btn" class="px-3.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white shadow">
+ Code Editor
+ </button>
+ <button id="view-diff-btn" class="px-3.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+ Live Diff Preview
+ </button>
+ </div>
+ <span id="validation-pill" class="text-xs font-medium px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+ Waiting for edit...
+ </span>
+ </div>
+ </div>
 
-        <!-- Editor View -->
-        <div id="editor-pane" class="p-4 sm:p-5">
-          <textarea id="sandbox-textarea" rows="11" class="w-full bg-[#070a12] text-slate-200 code-font text-xs sm:text-sm p-4 rounded-xl border border-slate-800 focus:border-sky-500 focus:outline-none custom-scrollbar leading-relaxed"></textarea>
-        </div>
+ <!-- Editor View -->
+ <div id="editor-pane" class="p-4 sm:p-5">
+ <textarea id="sandbox-textarea" rows="11" class="w-full bg-[#070a12] text-slate-200 code-font text-xs sm:text-sm p-4 rounded-xl border border-slate-800 focus:border-sky-500 focus:outline-none custom-scrollbar leading-relaxed"></textarea>
+ </div>
 
-        <!-- Diff View -->
-        <div id="diff-pane" class="hidden p-4 sm:p-5 space-y-2">
-          <div class="flex items-center justify-between text-xs text-slate-400 font-mono pb-1 border-b border-slate-800">
-            <span>Unified Diff Preview (Additions in Green, Deletions in Red)</span>
-            <span id="diff-stat-label" class="text-emerald-400 font-bold">+0 -0 lines</span>
-          </div>
-          <div id="diff-output" class="bg-[#070a12] p-4 rounded-xl border border-slate-800 font-mono text-xs sm:text-sm overflow-x-auto space-y-1"></div>
-        </div>
+ <!-- Diff View -->
+ <div id="diff-pane" class="hidden p-4 sm:p-5 space-y-2">
+ <div class="flex items-center justify-between text-xs text-slate-400 font-mono pb-1 border-b border-slate-800">
+ <span>Unified Diff Preview (Additions in Green, Deletions in Red)</span>
+ <span id="diff-stat-label" class="text-emerald-400 font-bold">+0 -0 lines</span>
+ </div>
+ <div id="diff-output" class="bg-[#070a12] p-4 rounded-xl border border-slate-800 font-mono text-xs sm:text-sm overflow-x-auto space-y-1"></div>
+ </div>
 
-        <!-- Action Bar at bottom of workspace -->
-        <div class="bg-slate-950 px-5 py-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <span class="text-xs text-slate-400">Done making edits? Proceed to submit your Pull Request.</span>
-          <button id="open-pr-drawer-btn" class="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2">
-            <span>Proceed to Step 3: Open PR</span> <span>→</span>
-          </button>
-        </div>
-      </div>
-    </section>
+ <!-- Action Bar at bottom of workspace -->
+ <div class="bg-slate-950 px-5 py-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+ <span class="text-xs text-slate-400">Done making edits? Proceed to submit your Pull Request.</span>
+ <button id="open-pr-drawer-btn" class="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2">
+ <span>Proceed to Step 3: Open PR</span> <span>→</span>
+ </button>
+ </div>
+ </div>
+ </section>
 
-    <!-- ==========================================
-         STEP 3: OPEN PULL REQUEST FORM
-         ========================================== -->
-    <section id="step-section-3" class="space-y-4 pt-4">
-      <div id="pr-submission-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-          <div>
-            <h3 class="text-xl font-bold text-white flex items-center gap-2">
-              <span>📬</span> 3. Open Your Pull Request (PR)
-            </h3>
-            <p class="text-sm text-slate-400 mt-1">
-              A Pull Request politely asks project maintainers to review and merge your changes into the codebase.
-            </p>
-          </div>
-          <button id="fill-pr-template-btn" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5">
-            <span>✨</span> <span>Auto-Fill PR Template</span>
-          </button>
-        </div>
+ <!-- ==========================================
+ STEP 3: OPEN PULL REQUEST FORM
+ ========================================== -->
+ <section id="step-section-3" class="space-y-4 pt-4">
+ <div id="pr-submission-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xl">
+ <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+ <div>
+ <h3 class="text-xl font-bold text-white flex items-center gap-2">
+ 3. Open Your Pull Request (PR)
+ </h3>
+ <p class="text-sm text-slate-400 mt-1">
+ A Pull Request politely asks project maintainers to review and merge your changes into the codebase.
+ </p>
+ </div>
+ <button id="fill-pr-template-btn" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5">
+ <span>Auto-Fill PR Template</span>
+ </button>
+ </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <label for="contributor-name-input" class="block text-xs font-bold text-slate-300 mb-1.5">Your Name or GitHub Handle (for your Certificate)</label>
-            <input id="contributor-name-input" type="text" value="Rowdy Hacker" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
-          </div>
-          <div>
-            <label for="pr-title-input" class="block text-xs font-bold text-slate-300 mb-1.5">Pull Request Title</label>
-            <input id="pr-title-input" type="text" placeholder="e.g., docs: fix broken student handbook link" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
-          </div>
-        </div>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+ <div>
+ <label for="contributor-name-input" class="block text-xs font-bold text-slate-300 mb-1.5">Your Name or GitHub Handle (for your Certificate)</label>
+ <input id="contributor-name-input" type="text" value="Rowdy Hacker" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
+ </div>
+ <div>
+ <label for="pr-title-input" class="block text-xs font-bold text-slate-300 mb-1.5">Pull Request Title</label>
+ <input id="pr-title-input" type="text" placeholder="e.g., docs: fix broken student handbook link" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none" />
+ </div>
+ </div>
 
-        <div>
-          <label for="pr-body-input" class="block text-xs font-bold text-slate-300 mb-1.5">What did you change and why does it help?</label>
-          <textarea id="pr-body-input" rows="3" placeholder="Briefly describe your change..." class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none leading-relaxed"></textarea>
-        </div>
+ <div>
+ <label for="pr-body-input" class="block text-xs font-bold text-slate-300 mb-1.5">What did you change and why does it help?</label>
+ <textarea id="pr-body-input" rows="3" placeholder="Briefly describe your change..." class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-orange-500 focus:outline-none leading-relaxed"></textarea>
+ </div>
 
-        <div class="flex items-center justify-end gap-3 pt-2">
-          <button id="submit-pr-btn" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
-            <span>🎉</span> <span>Submit Pull Request to RowdyBot</span>
-          </button>
-        </div>
-      </div>
-    </section>
+ <div class="flex items-center justify-end gap-3 pt-2">
+ <button id="submit-pr-btn" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+ <span>Submit Pull Request to RowdyBot</span>
+ </button>
+ </div>
+ </div>
+ </section>
 
-    <!-- ==========================================
-         STEP 4: ROWDYBOT REVIEW & BADGE
-         ========================================== -->
-    <section id="step-section-4" class="space-y-4 pt-4">
-      <div id="bot-review-card" class="hidden bg-gradient-to-br from-slate-900 via-[#0d1f33] to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
-        <!-- Review Header -->
-        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
-          <div class="flex items-center gap-3">
-            <img src="assets/images/images.png" alt="RowdyBot" class="w-12 h-12 rounded-xl object-contain bg-slate-950 border border-emerald-400 p-1" />
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="font-extrabold text-white text-base sm:text-lg">RowdyBot Maintainer</span>
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">APPROVED & MERGED</span>
-              </div>
-              <p class="text-xs text-slate-400">Automated check passed • Merged into main branch</p>
-            </div>
-          </div>
-          <span class="px-3.5 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-mono font-bold">
-            🟣 Merged into main
-          </span>
-        </div>
+ <!-- ==========================================
+ STEP 4: ROWDYBOT REVIEW & BADGE
+ ========================================== -->
+ <section id="step-section-4" class="space-y-4 pt-4">
+ <div id="bot-review-card" class="hidden bg-gradient-to-br from-slate-900 via-[#0d1f33] to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
+ <!-- Review Header -->
+ <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+ <div class="flex items-center gap-3">
+ <img src="assets/images/images.png" alt="RowdyBot" class="w-12 h-12 rounded-xl object-contain bg-slate-950 border border-emerald-400 p-1" />
+ <div>
+ <div class="flex items-center gap-2">
+ <span class="font-extrabold text-white text-base sm:text-lg">RowdyBot Maintainer</span>
+ <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">APPROVED & MERGED</span>
+ </div>
+ <p class="text-xs text-slate-400">Automated check passed • Merged into main branch</p>
+ </div>
+ </div>
+ <span class="px-3.5 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-mono font-bold">
+ Merged into main
+ </span>
+ </div>
 
-        <!-- Bot Comment -->
-        <div id="bot-review-comment" class="p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-sm text-slate-200 leading-relaxed"></div>
+ <!-- Bot Comment -->
+ <div id="bot-review-comment" class="p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-sm text-slate-200 leading-relaxed"></div>
 
-        <!-- Canvas Certificate & Download -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center pt-2">
-          <div class="md:col-span-7 bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-center shadow-xl">
-            <canvas id="badge-canvas" width="520" height="300" class="w-full max-w-md h-auto rounded-lg shadow-lg"></canvas>
-          </div>
-          <div class="md:col-span-5 space-y-4">
-            <div class="space-y-1.5">
-              <h4 class="font-bold text-white text-lg">🏆 First Contributor Badge Unlocked!</h4>
-              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                You just completed the exact workflow professional developers use every day at Google, Meta, and UTSA OSPO.
-              </p>
-            </div>
-            <div class="flex flex-col gap-2.5 pt-1">
-              <button id="download-badge-btn" class="w-full py-3 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2">
-                <span>⬇️</span> <span>Download Official PNG Certificate</span>
-              </button>
-              <button id="go-to-live-issues-btn" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold text-xs sm:text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
-                <span>🧭</span> <span>Explore Real Good First Issues →</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+ <!-- Canvas Certificate & Download -->
+ <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center pt-2">
+ <div class="md:col-span-7 bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-center shadow-xl">
+ <canvas id="badge-canvas" width="520" height="300" class="w-full max-w-md h-auto rounded-lg shadow-lg"></canvas>
+ </div>
+ <div class="md:col-span-5 space-y-4">
+ <div class="space-y-1.5">
+ <h4 class="font-bold text-white text-lg"> First Contributor Badge Unlocked!</h4>
+ <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+ You just completed the exact workflow professional developers use every day at Google, Meta, and UTSA OSPO.
+ </p>
+ </div>
+ <div class="flex flex-col gap-2.5 pt-1">
+ <button id="download-badge-btn" class="w-full py-3 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2">
+ <span>⬇</span> <span>Download Official PNG Certificate</span>
+ </button>
+ <button id="go-to-live-issues-btn" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold text-xs sm:text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
+ <span>Explore Real Good First Issues →</span>
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
 
-  </section>
+ </section>
 
 <section id="tab-visualizer" class="tab-panel hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-        <div class="max-w-3xl space-y-2">
-          <span class="px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 text-xs font-semibold">Interactive Visual Metaphor</span>
-          <h2 class="text-2xl font-extrabold text-white" data-i18n="viz_title">Git Commands vs. Everyday Life (Group Potluck Analogy)</h2>
-          <p class="text-sm text-slate-300" data-i18n="viz_subtitle">
-            Terminal commands sound scary only because nobody explains the real-world story behind them. Click each step of the journey below to see what happens visually!
-          </p>
-        </div>
+ <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+ <div class="max-w-3xl space-y-2">
+ <span class="px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 text-xs font-semibold">Interactive Visual Metaphor</span>
+ <h2 class="text-2xl font-extrabold text-white" data-i18n="viz_title">Git Commands vs. Everyday Life (Group Potluck Analogy)</h2>
+ <p class="text-sm text-slate-300" data-i18n="viz_subtitle">
+ Terminal commands sound scary only because nobody explains the real-world story behind them. Click each step of the journey below to see what happens visually!
+ </p>
+ </div>
 
-        <!-- Interactive Step Buttons -->
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-2" id="viz-step-buttons">
-          <button data-viz="0" class="viz-btn p-3 rounded-xl border border-orange-500 bg-orange-500/15 text-left transition-all">
-            <div class="text-xs font-mono text-orange-400">Step 1 • Repo</div>
-            <div class="font-bold text-white text-sm mt-0.5">1. Repository</div>
-          </button>
-          <button data-viz="1" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
-            <div class="text-xs font-mono text-sky-400">Step 2 • Fork</div>
-            <div class="font-bold text-white text-sm mt-0.5">2. Fork & Clone</div>
-          </button>
-          <button data-viz="2" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
-            <div class="text-xs font-mono text-emerald-400">Step 3 • Branch</div>
-            <div class="font-bold text-white text-sm mt-0.5">3. Create Branch</div>
-          </button>
-          <button data-viz="3" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
-            <div class="text-xs font-mono text-amber-400">Step 4 • Commit</div>
-            <div class="font-bold text-white text-sm mt-0.5">4. Commit & Push</div>
-          </button>
-          <button data-viz="4" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
-            <div class="text-xs font-mono text-purple-400">Step 5 • PR & Merge</div>
-            <div class="font-bold text-white text-sm mt-0.5">5. Pull Request</div>
-          </button>
-        </div>
+ <!-- Interactive Step Buttons -->
+ <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-2" id="viz-step-buttons">
+ <button data-viz="0" class="viz-btn p-3 rounded-xl border border-orange-500 bg-orange-500/15 text-left transition-all">
+ <div class="text-xs font-mono text-orange-400">Step 1 • Repo</div>
+ <div class="font-bold text-white text-sm mt-0.5">1. Repository</div>
+ </button>
+ <button data-viz="1" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
+ <div class="text-xs font-mono text-sky-400">Step 2 • Fork</div>
+ <div class="font-bold text-white text-sm mt-0.5">2. Fork & Clone</div>
+ </button>
+ <button data-viz="2" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
+ <div class="text-xs font-mono text-emerald-400">Step 3 • Branch</div>
+ <div class="font-bold text-white text-sm mt-0.5">3. Create Branch</div>
+ </button>
+ <button data-viz="3" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
+ <div class="text-xs font-mono text-amber-400">Step 4 • Commit</div>
+ <div class="font-bold text-white text-sm mt-0.5">4. Commit & Push</div>
+ </button>
+ <button data-viz="4" class="viz-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/70 text-left transition-all">
+ <div class="text-xs font-mono text-purple-400">Step 5 • PR & Merge</div>
+ <div class="font-bold text-white text-sm mt-0.5">5. Pull Request</div>
+ </button>
+ </div>
 
-        <!-- Visual Comparison Card -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3">
-          <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-            <div class="text-xs font-bold uppercase tracking-wider text-amber-400">🌮 Real-Life Cookbook Analogy</div>
-            <h3 id="viz-analogy-title" class="text-lg font-bold text-white">The Shared Family Recipe Book</h3>
-            <p id="viz-analogy-body" class="text-sm text-slate-300 leading-relaxed"></p>
-          </div>
-          <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-            <div class="text-xs font-bold uppercase tracking-wider text-sky-400">🖱️ What You Do on GitHub Web (No CLI)</div>
-            <h3 id="viz-web-title" class="text-lg font-bold text-white">Browse the Project Page</h3>
-            <p id="viz-web-body" class="text-sm text-slate-300 leading-relaxed"></p>
-          </div>
-          <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-            <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">💻 Equivalent Terminal Command (Demystified)</div>
-            <pre id="viz-cli-code" class="p-3 rounded-xl bg-slate-900 text-emerald-300 code-font text-xs overflow-x-auto border border-slate-800"></pre>
-            <p id="viz-cli-note" class="text-xs text-slate-400 leading-relaxed"></p>
-          </div>
-        </div>
-      </div>
-    </section>
+ <!-- Visual Comparison Card -->
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3">
+ <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+ <div class="text-xs font-bold uppercase tracking-wider text-amber-400"> Real-Life Cookbook Analogy</div>
+ <h3 id="viz-analogy-title" class="text-lg font-bold text-white">The Shared Family Recipe Book</h3>
+ <p id="viz-analogy-body" class="text-sm text-slate-300 leading-relaxed"></p>
+ </div>
+ <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+ <div class="text-xs font-bold uppercase tracking-wider text-sky-400"> What You Do on GitHub Web (No CLI)</div>
+ <h3 id="viz-web-title" class="text-lg font-bold text-white">Browse the Project Page</h3>
+ <p id="viz-web-body" class="text-sm text-slate-300 leading-relaxed"></p>
+ </div>
+ <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+ <div class="text-xs font-bold uppercase tracking-wider text-emerald-400"> Equivalent Terminal Command (Demystified)</div>
+ <pre id="viz-cli-code" class="p-3 rounded-xl bg-slate-900 text-emerald-300 code-font text-xs overflow-x-auto border border-slate-800"></pre>
+ <p id="viz-cli-note" class="text-xs text-slate-400 leading-relaxed"></p>
+ </div>
+ </div>
+ </div>
+ </section>
 
 <section id="tab-issues" class="tab-panel hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-semibold">Real Open Source Projects</span>
-            <h2 class="text-2xl font-extrabold text-white mt-1" data-i18n="issues_title">Beginner-Friendly "Good First Issue" Matcher</h2>
-            <p class="text-sm text-slate-300" data-i18n="issues_subtitle">
-              Filter by your major or comfort level—over 40% of open source contributions require zero coding!
-            </p>
-          </div>
+ <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+ <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+ <div>
+ <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-semibold">Real Open Source Projects</span>
+ <h2 class="text-2xl font-extrabold text-white mt-1" data-i18n="issues_title">Beginner-Friendly"Good First Issue" Matcher</h2>
+ <p class="text-sm text-slate-300" data-i18n="issues_subtitle">
+ Filter by your major or comfort level—over 40% of open source contributions require zero coding!
+ </p>
+ </div>
 
-          <!-- Category Filter Pills -->
-          <div class="flex flex-wrap items-center gap-2" id="issue-filter-group">
-            <button data-filter="all" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500 text-white">All (8)</button>
-            <button data-filter="non-code" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800">📝 Non-Code / Docs</button>
-            <button data-filter="esl" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800">🌎 Bilingual / Translation</button>
-            <button data-filter="design" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800">🎨 UI / Accessibility</button>
-            <button data-filter="code" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800">💻 Starter Code</button>
-          </div>
-        </div>
+ <!-- Category Filter Pills -->
+ <div class="flex flex-wrap items-center gap-2" id="issue-filter-group">
+ <button data-filter="all" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500 text-white">All (8)</button>
+ <button data-filter="non-code" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800"> Non-Code / Docs</button>
+ <button data-filter="esl" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800"> Bilingual / Translation</button>
+ <button data-filter="design" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800"> UI / Accessibility</button>
+ <button data-filter="code" class="issue-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 hover:bg-slate-800 border border-slate-800"> Starter Code</button>
+ </div>
+ </div>
 
-        <!-- Issues Grid -->
-        <div id="issues-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-      </div>
-    </section>
+ <!-- Issues Grid -->
+ <div id="issues-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+ </div>
+ </section>
 
 <section id="tab-glossary" class="tab-panel hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span class="px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 text-xs font-semibold">English & Español Dictionary</span>
-            <h2 class="text-2xl font-extrabold text-white mt-1" data-i18n="glossary_title">Bilingual Open Source Jargon Decoder</h2>
-            <p class="text-sm text-slate-300" data-i18n="glossary_subtitle">
-              Search any intimidating Git or GitHub term to see its plain-language definition and everyday analogy in English and Spanish.
-            </p>
-          </div>
-          <div class="w-full sm:w-72">
-            <input id="glossary-search-input" type="search" placeholder="Search term (e.g. Fork, PR, Merge)..." class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-sky-400 focus:outline-none" />
-          </div>
-        </div>
+ <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+ <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+ <div>
+ <span class="px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 text-xs font-semibold">English & Español Dictionary</span>
+ <h2 class="text-2xl font-extrabold text-white mt-1" data-i18n="glossary_title">Bilingual Open Source Jargon Decoder</h2>
+ <p class="text-sm text-slate-300" data-i18n="glossary_subtitle">
+ Search any intimidating Git or GitHub term to see its plain-language definition and everyday analogy in English and Spanish.
+ </p>
+ </div>
+ <div class="w-full sm:w-72">
+ <input id="glossary-search-input" type="search" placeholder="Search term (e.g. Fork, PR, Merge)..." class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-sky-400 focus:outline-none" />
+ </div>
+ </div>
 
-        <div id="glossary-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      </div>
-    </section>
+ <div id="glossary-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+ </div>
+ </section>
 
 <section id="tab-reusability" class="tab-panel hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-        <div class="max-w-3xl space-y-1.5">
-          <span class="px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 text-xs font-semibold">Judging Criterion: Reusability (MIT Licensed)</span>
-          <h2 class="text-2xl font-extrabold text-white">Live Campus & Club Customizer (`club.config.json`)</h2>
-          <p class="text-sm text-slate-300">
-            Any university OSPO, ACM chapter, or high school coding club can adopt OpenBridge in 60 seconds. Test changing the school name and theme below—watch the live app header update immediately!
-          </p>
-        </div>
+ <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+ <div class="max-w-3xl space-y-1.5">
+ <span class="px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 text-xs font-semibold">Judging Criterion: Reusability (MIT Licensed)</span>
+ <h2 class="text-2xl font-extrabold text-white">Live Campus & Club Customizer (`club.config.json`)</h2>
+ <p class="text-sm text-slate-300">
+ Any university OSPO, ACM chapter, or high school coding club can adopt OpenBridge in 60 seconds. Test changing the school name and theme below—watch the live app header update immediately!
+ </p>
+ </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <!-- Customizer Form -->
-          <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
-            <div>
-              <label for="cfg-org-input" class="block text-xs font-bold text-slate-300 mb-1">University / Club Badge Name</label>
-              <input id="cfg-org-input" type="text" value="UTSA OSPO" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
-            </div>
-            <div>
-              <label for="cfg-title-input" class="block text-xs font-bold text-slate-300 mb-1">Platform Portal Title</label>
-              <input id="cfg-title-input" type="text" value="OpenBridge" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
-            </div>
-            <div>
-              <label for="cfg-repo-input" class="block text-xs font-bold text-slate-300 mb-1">Default Practice Repository</label>
-              <input id="cfg-repo-input" type="text" value="utsa-ospo/student-launchpad" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white font-mono" />
-            </div>
-            <div class="flex items-center gap-3 pt-2">
-              <button id="apply-config-btn" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm transition-all">
-                ✨ Apply Branding Live
-              </button>
-              <button id="copy-config-btn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700 transition-all">
-                📋 Copy club.config.json
-              </button>
-            </div>
-          </div>
+ <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+ <!-- Customizer Form -->
+ <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+ <div>
+ <label for="cfg-org-input" class="block text-xs font-bold text-slate-300 mb-1">University / Club Badge Name</label>
+ <input id="cfg-org-input" type="text" value="UTSA OSPO" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
+ </div>
+ <div>
+ <label for="cfg-title-input" class="block text-xs font-bold text-slate-300 mb-1">Platform Portal Title</label>
+ <input id="cfg-title-input" type="text" value="OpenBridge" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white" />
+ </div>
+ <div>
+ <label for="cfg-repo-input" class="block text-xs font-bold text-slate-300 mb-1">Default Practice Repository</label>
+ <input id="cfg-repo-input" type="text" value="utsa-ospo/student-launchpad" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white font-mono" />
+ </div>
+ <div class="flex items-center gap-3 pt-2">
+ <button id="apply-config-btn" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm transition-all">
+ Apply Branding Live
+ </button>
+ <button id="copy-config-btn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700 transition-all">
+ Copy club.config.json
+ </button>
+ </div>
+ </div>
 
-          <!-- Generated JSON Output -->
-          <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-2">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-mono text-emerald-400">club.config.json</span>
-              <span>MIT License • Ready to Fork</span>
-            </div>
-            <pre id="config-json-preview" class="p-4 rounded-xl bg-[#070a12] text-sky-300 code-font text-xs overflow-x-auto border border-slate-800 leading-relaxed"></pre>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+ <!-- Generated JSON Output -->
+ <div class="lg:col-span-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-2">
+ <div class="flex items-center justify-between text-xs text-slate-400">
+ <span class="font-mono text-emerald-400">club.config.json</span>
+ <span>MIT License • Ready to Fork</span>
+ </div>
+ <pre id="config-json-preview" class="p-4 rounded-xl bg-[#070a12] text-sky-300 code-font text-xs overflow-x-auto border border-slate-800 leading-relaxed"></pre>
+ </div>
+ </div>
+ </div>
+ </section>
+ </main>
 
-  <footer class="border-t border-slate-800/80 bg-slate-950/60 py-4 px-4 sm:px-6 mt-10">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-white">OpenBridge</span>
-        <span>•</span>
-        <span>Built for RowdyLaunch Track 03 (Open Source Education — UTSA OSPO)</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <a href="index.html" class="text-orange-400 hover:text-orange-300">Multi-Page Mode</a>
-        <span>•</span>
-        <a href="visuals.html" class="hover:text-white transition-colors">UI Kit & Visuals</a>
-        <span>•</span>
-        <a href="https://github.com/utsa-ospo" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white">UTSA OSPO GitHub ↗</a>
-      </div>
-    </div>
-  </footer>
+ <footer class="border-t border-slate-800/80 bg-slate-950/60 py-4 px-4 sm:px-6 mt-10">
+ <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+ <div class="flex items-center gap-2">
+ <span class="font-bold text-white">OpenBridge</span>
+ <span>•</span>
+ <span>Built for RowdyLaunch Track 03 (Open Source Education — UTSA OSPO)</span>
+ </div>
+ <div class="flex items-center gap-3">
+ <a href="index.html" class="text-orange-400 hover:text-orange-300">Multi-Page Mode</a>
+ <span>•</span>
+ <a href="visuals.html" class="hover:text-white transition-colors">UI Kit & Visuals</a>
+ <span>•</span>
+ <a href="https://github.com/utsa-ospo" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white">UTSA OSPO GitHub ↗</a>
+ </div>
+ </div>
+ </footer>
 
-  <!-- MODULAR SCRIPTS (Code Separated from Markup & Visuals) -->
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/sound.js"></script>
-  <script src="assets/js/badge.js"></script>
-  <script src="assets/js/i18n.js"></script>
-  <script src="assets/js/common.js"></script>
-  <script src="assets/js/gemma.js"></script>
-  <script src="assets/js/simulator.js"></script>
-  <script src="assets/js/visualizer.js"></script>
-  <script src="assets/js/issues.js"></script>
-  <script src="assets/js/glossary.js"></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/main.js"></script>
-  <!-- PROMINENT FLOATING CHATBOT LAUNCHER -->
-  <a href="chat.html" class="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs sm:text-sm shadow-2xl shadow-orange-500/30 flex items-center gap-2.5 transition-all hover:scale-105 border border-orange-400/50 group">
-    <div class="w-6 h-6 rounded-full overflow-hidden bg-slate-900 border border-white/50 flex-shrink-0 p-0.5">
-      <img src="assets/images/images.png" alt="Bot" class="w-full h-full object-contain" />
-    </div>
-    <span>💬 Ask Open Source Bot</span>
-    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-  </a>
+ <!-- MODULAR SCRIPTS (Code Separated from Markup & Visuals) -->
+ <script src="assets/js/data.js"></script>
+ <script src="assets/js/sound.js"></script>
+ <script src="assets/js/badge.js"></script>
+ <script src="assets/js/i18n.js"></script>
+ <script src="assets/js/common.js"></script>
+ <script src="assets/js/gemma.js"></script>
+ <script src="assets/js/simulator.js"></script>
+ <script src="assets/js/visualizer.js"></script>
+ <script src="assets/js/issues.js"></script>
+ <script src="assets/js/glossary.js"></script>
+ <script src="assets/js/config.js"></script>
+ <script src="assets/js/main.js"></script>
+ <!-- PROMINENT FLOATING CHATBOT LAUNCHER -->
+ <a href="chat.html" class="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs sm:text-sm shadow-2xl shadow-orange-500/30 flex items-center gap-2.5 transition-all hover:scale-105 border border-orange-400/50 group">
+ <div class="w-6 h-6 rounded-full overflow-hidden bg-slate-900 border border-white/50 flex-shrink-0 p-0.5">
+ <img src="assets/images/images.png" alt="Bot" class="w-full h-full object-contain" />
+ </div>
+ <span> Ask Open Source Bot</span>
+ <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+ </a>
 
 </body>
 </html>
