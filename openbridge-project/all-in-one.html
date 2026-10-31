@@ -198,12 +198,31 @@
           <p id="active-quest-goal" class="text-xs sm:text-sm text-slate-100 font-mono leading-relaxed"></p>
         </div>
 
-        <!-- RowdyBot Tip -->
-        <div class="flex items-center gap-3 pt-1 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800/60">
-          <img src="assets/images/images.png" alt="RowdyBot" class="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-sky-400/40 p-0.5 flex-shrink-0" />
-          <p id="rowdybot-coach-msg" class="italic leading-relaxed">
-            "Pick a quest or edit the file below. Check the Live Diff tab to preview your additions in green!"
-          </p>
+                <!-- RowdyBot Tip & Ask Gemma 4 E4B Input -->
+        <div class="space-y-3 pt-1 text-xs text-slate-300 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+          <div class="flex items-start gap-3">
+            <img src="assets/images/images.png" alt="RowdyBot" class="w-9 h-9 rounded-lg object-contain bg-slate-900 border border-sky-400/40 p-0.5 flex-shrink-0 mt-0.5" />
+            <div class="space-y-1 flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-xs sm:text-sm">RowdyBot Mentor</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Gemma 4 E4B
+                </span>
+              </div>
+              <p id="rowdybot-coach-msg" class="italic text-slate-300 text-xs sm:text-sm leading-relaxed">
+                "Make your change in the editor below. You can also ask me any question about Git or this quest below!"
+              </p>
+            </div>
+          </div>
+
+          <!-- Ask RowdyBot AI Input Box -->
+          <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+            <input id="coach-question-input" type="text" placeholder="Ask RowdyBot anything (e.g., Why do we use branches? What is a diff?)..." class="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none" />
+            <button id="ask-coach-btn" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-slate-950 font-bold text-xs transition-all flex items-center gap-1">
+              <span>Ask</span> <span>⚡</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -525,6 +544,7 @@
   <script src="assets/js/badge.js"></script>
   <script src="assets/js/i18n.js"></script>
   <script src="assets/js/common.js"></script>
+  <script src="assets/js/gemma.js"></script>
   <script src="assets/js/simulator.js"></script>
   <script src="assets/js/visualizer.js"></script>
   <script src="assets/js/issues.js"></script>
