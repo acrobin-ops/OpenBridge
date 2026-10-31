@@ -10,7 +10,7 @@
  nav_issues: 'Live Issues',
  nav_glossary: 'Jargon Decoder',
  nav_reuse: 'Club Config',
- hero_pill: 'Track 03: Open Source Education — No Terminal Needed',
+ hero_pill: 'Open Source Education — No Terminal Needed',
  step_1: 'Pick Quest',
  step_2: 'Sandbox Edit',
  step_3: 'Submit PR',
@@ -48,7 +48,7 @@
  nav_issues: 'Proyectos Reales',
  nav_glossary: 'Glosario Git',
  nav_reuse: 'Configurar Club',
- hero_pill: 'Track 03: Educación Open Source — Sin Terminal',
+ hero_pill: 'Educación Open Source — Sin Terminal',
  step_1: 'Elegir Misión',
  step_2: 'Editar Archivo',
  step_3: 'Enviar PR',
@@ -284,7 +284,7 @@
  categoryLabel: ' Bilingual / Español',
  skill: 'No Coding Required • Español',
  mentor: 'RowdyBot & UTSA OSPO Team',
- url: 'https://rowdylaunch.vercel.app/guide#tracks'
+ url: 'https://github.com/utsa-ospo'
  },
  {
  id: 'iss-2',
@@ -304,7 +304,7 @@
  categoryLabel: ' Non-Code / Docs',
  skill: 'English Writing • Clarity Audit',
  mentor: 'ACM Student Maintainers',
- url: 'https://rowdylaunch.vercel.app/guide#tracks'
+ url: 'https://github.com/utsa-ospo'
  },
  {
  id: 'iss-4',
@@ -334,7 +334,7 @@
  categoryLabel: ' UI / Design',
  skill: 'Figma / SVG • Zero JS Needed',
  mentor: 'UTSA OSPO Design Lead',
- url: 'https://rowdylaunch.vercel.app/guide#tracks'
+ url: 'https://github.com/utsa-ospo'
  },
  {
  id: 'iss-7',
@@ -354,6 +354,6 @@
  categoryLabel: ' Starter Code',
  skill: 'JavaScript / JSON • Beginner Code',
  mentor: 'UTSA OSPO Maintainers',
- url: 'https://rowdylaunch.vercel.app/guide#tracks'
+ url: 'https://github.com/utsa-ospo'
  }
  ];

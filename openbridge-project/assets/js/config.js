@@ -24,7 +24,7 @@ window.OpenBridge = window.OpenBridge || {};
  defaultPracticeRepo: repo,
  license: 'MIT',
  bilingualLocales: ['en', 'es'],
- tracksEnabled: ['docs-fix', 'es-translation', 'wall-of-fame', 'css-theme']
+ questsEnabled: ['docs-fix', 'es-translation', 'wall-of-fame', 'css-theme']
  };
 
  previewEl.textContent = JSON.stringify(configObj, null, 2);
