@@ -278,7 +278,7 @@ window.OpenBridge = window.OpenBridge || {};
     // Submit PR & Trigger RowdyBot Review + Confetti
     const submitPrBtn = document.getElementById('submit-pr-btn');
     if (submitPrBtn) {
-      submitPrBtn.addEventListener('click', () => {
+      submitPrBtn.addEventListener('click', async () => {
         const q = getActiveQuest();
         if (!q || !textarea) return;
 
@@ -307,26 +307,56 @@ window.OpenBridge = window.OpenBridge || {};
         }
 
         const reviewCard = document.getElementById('bot-review-card');
-        if (reviewCard) reviewCard.classList.remove('hidden');
+        if (reviewCard) {
+          reviewCard.classList.remove('hidden');
+          reviewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         const lang = window.OpenBridge.i18n ? window.OpenBridge.i18n.getLang() : 'en';
         const questTitle = lang === 'en' ? q.enTitle : q.esTitle;
-
         const botComment = document.getElementById('bot-review-comment');
+
         if (botComment) {
           botComment.innerHTML = `
-            <p class="font-bold text-emerald-400">🎉 ¡Felicidades / Congratulations, ${escapeHtml(contributor)}!</p>
-            <p>I reviewed your Pull Request <strong>"${escapeHtml(prTitle)}"</strong> on branch <code>${q.branch}</code>. Your diff cleanly resolves the issue without any conflicts. Welcome to the open-source community!</p>
+            <div class="flex items-center gap-2.5 text-sky-400 py-1">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+              <span class="text-xs sm:text-sm font-semibold">RowdyBot AI (Gemma 4 E4B) is analyzing your code diff...</span>
+            </div>
           `;
         }
 
+        // Call Gemma 4 E4B AI engine for live token streaming review
+        const diffText = document.getElementById('diff-output')?.innerText || '';
+        if (window.OpenBridge.gemma) {
+          await window.OpenBridge.gemma.reviewPullRequest(diffText, questTitle, contributor, lang, (chunk, fullText) => {
+            if (botComment) {
+              botComment.innerHTML = `
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span>⚡</span> <span>Verified by Gemma 4 E4B</span>
+                    </span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </div>
+                  <p class="text-slate-100 text-sm sm:text-base font-medium leading-relaxed">${escapeHtml(fullText)}</p>
+                </div>
+              `;
+            }
+          });
+        }
+
+        // Draw Official Verified Certificate
         if (window.OpenBridge.badge) {
           window.OpenBridge.badge.draw(contributor, questTitle);
         }
 
-        if (reviewCard) reviewCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (window.OpenBridge.sound) window.OpenBridge.sound.play('success');
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+        }
+
         if (window.OpenBridge.common) {
-          window.OpenBridge.common.showToast('Pull Request Merged! Certificate unlocked 🏆', '🎉');
+          window.OpenBridge.common.showToast('Pull Request Merged! Gemma 4 E4B verified your badge 🏆', '🎉');
         }
       });
     }
@@ -386,6 +416,35 @@ window.OpenBridge = window.OpenBridge || {};
       updateDiffAndValidation();
     });
   }
+
+      // Ask RowdyBot AI Coach Question Listener (Gemma 4 E4B)
+    const askCoachBtn = document.getElementById('ask-coach-btn');
+    const coachInput = document.getElementById('coach-question-input');
+    const coachMsg = document.getElementById('rowdybot-coach-msg');
+
+    if (askCoachBtn && coachInput && coachMsg) {
+      askCoachBtn.addEventListener('click', async () => {
+        const question = coachInput.value.trim();
+        if (!question) return;
+
+        if (window.OpenBridge.sound) window.OpenBridge.sound.play('click');
+        coachMsg.textContent = 'Thinking with Gemma 4 E4B...';
+
+        const q = getActiveQuest();
+        const lang = window.OpenBridge.i18n ? window.OpenBridge.i18n.getLang() : 'en';
+
+        if (window.OpenBridge.gemma) {
+          await window.OpenBridge.gemma.askCoach(question, q, lang, (chunk, fullText) => {
+            coachMsg.textContent = `"${fullText}"`;
+          });
+        }
+        coachInput.value = '';
+      });
+
+      coachInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') askCoachBtn.click();
+      });
+    }
 
   window.OpenBridge.simulator = {
     init: initSimulator,
